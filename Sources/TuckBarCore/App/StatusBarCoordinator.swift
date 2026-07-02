@@ -10,6 +10,7 @@ final class StatusBarCoordinator: NSObject {
     private let dockIconController: DockIconController
     private let statusItem: NSStatusItem
     private var panel: NSPanel?
+    private var settingsWindow: NSWindow?
     private var scanTimer: Timer?
     private var proxiesByID: [String: MenuBarItemProxy] = [:]
 
@@ -57,6 +58,11 @@ final class StatusBarCoordinator: NSObject {
     }
 
     @objc private func togglePanel() {
+        if NSApp.currentEvent?.type == .rightMouseUp {
+            showSettings()
+            return
+        }
+
         if panel?.isVisible == true {
             panel?.orderOut(nil)
         } else {
@@ -64,7 +70,7 @@ final class StatusBarCoordinator: NSObject {
         }
     }
 
-    private func showPanel() {
+    func showPanel() {
         if panel == nil {
             panel = makePanel()
         }
@@ -92,6 +98,7 @@ final class StatusBarCoordinator: NSObject {
             dockIconController: dockIconController,
             hasAccessibilityPermission: accessibilityClient.isTrusted,
             onRefresh: { [weak self] in self?.refresh() },
+            onOpenSettings: { [weak self] in self?.showSettings() },
             onRequestPermission: { [weak self] in self?.requestAccessibilityPermission() },
             onPress: { [weak self] id in self?.pressItem(withID: id) },
             onQuit: { NSApp.terminate(nil) }
@@ -113,7 +120,37 @@ final class StatusBarCoordinator: NSObject {
         return panel
     }
 
-    private func refresh() {
+    func showSettings() {
+        if settingsWindow == nil {
+            settingsWindow = makeSettingsWindow()
+        }
+
+        settingsWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func makeSettingsWindow() -> NSWindow {
+        let view = SettingsView(
+            store: store,
+            dockIconController: dockIconController,
+            hasAccessibilityPermission: accessibilityClient.isTrusted,
+            onRefresh: { [weak self] in self?.refresh() },
+            onRequestPermission: { [weak self] in self?.requestAccessibilityPermission() },
+            onPress: { [weak self] id in self?.pressItem(withID: id) }
+        )
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 720, height: 520),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "TuckBar Settings"
+        window.contentView = NSHostingView(rootView: view)
+        window.center()
+        return window
+    }
+
+    func refresh() {
         guard accessibilityClient.isTrusted else {
             store.markAllUnavailable()
             return

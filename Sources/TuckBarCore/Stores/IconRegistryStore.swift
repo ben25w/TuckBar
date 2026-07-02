@@ -94,6 +94,22 @@ final class IconRegistryStore: ObservableObject {
         save()
     }
 
+    func moveRecord(id: String, direction: MoveDirection) {
+        guard let index = records.firstIndex(where: { $0.id == id }) else { return }
+        let destination: Int
+        switch direction {
+        case .up:
+            destination = max(records.startIndex, index - 1)
+        case .down:
+            destination = min(records.index(before: records.endIndex), index + 1)
+        }
+
+        guard destination != index else { return }
+        records.swapAt(index, destination)
+        records = records.renumbered()
+        save()
+    }
+
     func setPlacementMode(_ mode: PlacementMode, for id: String) {
         guard let index = records.firstIndex(where: { $0.id == id }) else { return }
         records[index].placementMode = mode
@@ -109,6 +125,11 @@ final class IconRegistryStore: ObservableObject {
     func visibleShelfRecords() -> [MenuBarItemRecord] {
         records.filter { $0.placementMode == .virtualMenu || $0.placementMode == .both }
     }
+}
+
+enum MoveDirection {
+    case up
+    case down
 }
 
 private extension Array where Element == MenuBarItemRecord {

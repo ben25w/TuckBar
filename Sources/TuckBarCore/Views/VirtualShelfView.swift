@@ -5,6 +5,7 @@ struct VirtualShelfView: View {
     @ObservedObject var dockIconController: DockIconController
     let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
+    let onOpenSettings: () -> Void
     let onRequestPermission: () -> Void
     let onPress: (String) -> Void
     let onQuit: () -> Void
@@ -15,6 +16,7 @@ struct VirtualShelfView: View {
                 dockIconController: dockIconController,
                 hasAccessibilityPermission: hasAccessibilityPermission,
                 onRefresh: onRefresh,
+                onOpenSettings: onOpenSettings,
                 onRequestPermission: onRequestPermission,
                 onQuit: onQuit
             )
@@ -56,6 +58,7 @@ private struct ShelfToolbar: View {
     @ObservedObject var dockIconController: DockIconController
     let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
+    let onOpenSettings: () -> Void
     let onRequestPermission: () -> Void
     let onQuit: () -> Void
 
@@ -82,6 +85,10 @@ private struct ShelfToolbar: View {
                 Image(systemName: "arrow.clockwise")
             }
             .help("Refresh")
+            Button(action: onOpenSettings) {
+                Image(systemName: "gearshape")
+            }
+            .help("Settings")
             Button(action: onQuit) {
                 Image(systemName: "power")
             }

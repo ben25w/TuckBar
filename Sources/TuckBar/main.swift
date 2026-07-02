@@ -1,3 +1,0 @@
-import TuckBarCore
-
-TuckBarApplication.run()

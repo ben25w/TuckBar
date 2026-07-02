@@ -7,6 +7,8 @@ The app is intentionally outside the Mac App Store sandbox. Public AppKit APIs o
 ## Current Features
 
 - Menu-bar app with a single TuckBar status icon.
+- Dock click opens the Settings window.
+- App menu commands for Settings, Show Shelf, Refresh Items, and Quit.
 - Dock icon visibility toggle, visible by default while the app is being debugged.
 - Accessibility-based discovery of `AXExtrasMenuBar` and `AXMenuBarItem` items.
 - Vertical shelf anchored below the TuckBar icon.
@@ -59,6 +61,13 @@ swift test
 ## Permissions
 
 On first launch, open the TuckBar shelf and choose the permission button if needed. macOS will route you to System Settings so TuckBar can be enabled under Privacy & Security > Accessibility.
+
+## How To Organize Items
+
+1. Open TuckBar from the Dock, or click the TuckBar menu-bar icon and choose the gear button.
+2. Use the Settings window to set each detected item to `Real`, `Shelf`, or `Both`.
+3. Use the up/down buttons to choose shelf order.
+4. Click the TuckBar menu-bar icon to open the compact shelf.
 
 ## Status
 
