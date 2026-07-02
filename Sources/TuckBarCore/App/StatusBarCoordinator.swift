@@ -69,11 +69,16 @@ final class StatusBarCoordinator: NSObject {
         let buttonFrame = button.convert(button.bounds, to: nil)
         let screenFrame = window.convertToScreen(buttonFrame)
         let panelSize = panel.frame.size
-        let x = min(max(screenFrame.midX - panelSize.width / 2, 12), NSScreen.mainFrameMaxX - panelSize.width - 12)
-        let y = screenFrame.minY - panelSize.height - 8
+        let screen = NSScreen.screen(containing: screenFrame) ?? window.screen ?? NSScreen.main
+        let visibleFrame = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let margin: CGFloat = 8
+        let x = (screenFrame.midX - panelSize.width / 2)
+            .clamped(to: visibleFrame.minX + margin ... visibleFrame.maxX - panelSize.width - margin)
+        let y = (screenFrame.minY - panelSize.height - margin)
+            .clamped(to: visibleFrame.minY + margin ... visibleFrame.maxY - panelSize.height - margin)
 
         panel.setFrameOrigin(NSPoint(x: x, y: y))
-        panel.makeKeyAndOrderFront(nil)
+        panel.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
     }
 
@@ -142,8 +147,15 @@ final class StatusBarCoordinator: NSObject {
     }
 }
 
+private extension Comparable {
+    func clamped(to range: ClosedRange<Self>) -> Self {
+        min(max(self, range.lowerBound), range.upperBound)
+    }
+}
+
 private extension NSScreen {
-    static var mainFrameMaxX: CGFloat {
-        main?.visibleFrame.maxX ?? 1440
+    static func screen(containing rect: NSRect) -> NSScreen? {
+        let center = NSPoint(x: rect.midX, y: rect.midY)
+        return screens.first { $0.frame.contains(center) }
     }
 }

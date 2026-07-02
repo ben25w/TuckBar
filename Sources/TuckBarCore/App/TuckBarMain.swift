@@ -1,9 +1,12 @@
 import AppKit
 
 public enum TuckBarApplication {
+    private static var delegate: AppDelegate?
+
     public static func run() {
         let application = NSApplication.shared
         let delegate = AppDelegate()
+        Self.delegate = delegate
         application.delegate = delegate
         application.setActivationPolicy(.accessory)
         application.run()
