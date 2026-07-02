@@ -7,6 +7,7 @@ final class StatusBarCoordinator: NSObject {
     private let scanner: MenuBarScanning
     private let accessibilityClient: AccessibilityClient
     private let visibilityController: IconVisibilityControlling
+    private let dockIconController: DockIconController
     private let statusItem: NSStatusItem
     private var panel: NSPanel?
     private var scanTimer: Timer?
@@ -16,17 +17,20 @@ final class StatusBarCoordinator: NSObject {
         store: IconRegistryStore,
         scanner: MenuBarScanning,
         accessibilityClient: AccessibilityClient,
-        visibilityController: IconVisibilityControlling
+        visibilityController: IconVisibilityControlling,
+        dockIconController: DockIconController
     ) {
         self.store = store
         self.scanner = scanner
         self.accessibilityClient = accessibilityClient
         self.visibilityController = visibilityController
+        self.dockIconController = dockIconController
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         super.init()
     }
 
     func start() {
+        dockIconController.apply()
         configureStatusItem()
         store.load()
         refresh()
@@ -85,6 +89,7 @@ final class StatusBarCoordinator: NSObject {
     private func makePanel() -> NSPanel {
         let view = VirtualShelfView(
             store: store,
+            dockIconController: dockIconController,
             hasAccessibilityPermission: accessibilityClient.isTrusted,
             onRefresh: { [weak self] in self?.refresh() },
             onRequestPermission: { [weak self] in self?.requestAccessibilityPermission() },

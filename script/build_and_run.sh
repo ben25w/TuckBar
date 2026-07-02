@@ -53,8 +53,6 @@ cat >"$INFO_PLIST" <<PLIST
   <string>AppIcon</string>
   <key>LSMinimumSystemVersion</key>
   <string>$MIN_SYSTEM_VERSION</string>
-  <key>LSUIElement</key>
-  <true/>
   <key>NSAccessibilityUsageDescription</key>
   <string>TuckBar uses Accessibility to discover and press menu-bar extras you choose to show in its shelf.</string>
   <key>NSPrincipalClass</key>

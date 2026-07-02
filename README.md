@@ -6,7 +6,8 @@ The app is intentionally outside the Mac App Store sandbox. Public AppKit APIs o
 
 ## Current Features
 
-- Hidden-Dock menu-bar app with a single TuckBar status icon.
+- Menu-bar app with a single TuckBar status icon.
+- Dock icon visibility toggle, visible by default while the app is being debugged.
 - Accessibility-based discovery of `AXExtrasMenuBar` and `AXMenuBarItem` items.
 - Vertical shelf anchored below the TuckBar icon.
 - Click forwarding via `AXPress`.
@@ -27,7 +28,7 @@ The app is intentionally outside the Mac App Store sandbox. Public AppKit APIs o
 ./script/build_and_run.sh
 ```
 
-The script builds the SwiftPM executable, stages `dist/TuckBar.app`, and launches it as a real app bundle with `LSUIElement=true`.
+The script builds the SwiftPM executable, stages `dist/TuckBar.app`, and launches it as a real app bundle.
 
 Useful modes:
 

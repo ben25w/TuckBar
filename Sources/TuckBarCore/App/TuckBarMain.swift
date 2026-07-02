@@ -8,7 +8,7 @@ public enum TuckBarApplication {
         let delegate = AppDelegate()
         Self.delegate = delegate
         application.delegate = delegate
-        application.setActivationPolicy(.accessory)
+        application.setActivationPolicy(.regular)
         application.run()
     }
 }
@@ -21,12 +21,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let store = IconRegistryStore()
         let scanner = MenuBarScanner(accessibilityClient: accessibility)
         let visibility = IconVisibilityController()
+        let dockIconController = DockIconController()
 
         coordinator = StatusBarCoordinator(
             store: store,
             scanner: scanner,
             accessibilityClient: accessibility,
-            visibilityController: visibility
+            visibilityController: visibility,
+            dockIconController: dockIconController
         )
         coordinator?.start()
     }

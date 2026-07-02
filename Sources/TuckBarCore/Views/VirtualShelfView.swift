@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VirtualShelfView: View {
     @ObservedObject var store: IconRegistryStore
+    @ObservedObject var dockIconController: DockIconController
     let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
     let onRequestPermission: () -> Void
@@ -11,6 +12,7 @@ struct VirtualShelfView: View {
     var body: some View {
         VStack(spacing: 0) {
             ShelfToolbar(
+                dockIconController: dockIconController,
                 hasAccessibilityPermission: hasAccessibilityPermission,
                 onRefresh: onRefresh,
                 onRequestPermission: onRequestPermission,
@@ -51,6 +53,7 @@ struct VirtualShelfView: View {
 }
 
 private struct ShelfToolbar: View {
+    @ObservedObject var dockIconController: DockIconController
     let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
     let onRequestPermission: () -> Void
@@ -62,6 +65,13 @@ private struct ShelfToolbar: View {
             Text("TuckBar")
                 .font(.headline)
             Spacer()
+            Toggle("Dock", isOn: Binding(
+                get: { dockIconController.isDockIconVisible },
+                set: { dockIconController.setDockIconVisible($0) }
+            ))
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            .help("Show Dock icon")
             if !hasAccessibilityPermission {
                 Button(action: onRequestPermission) {
                     Image(systemName: "lock.open")
