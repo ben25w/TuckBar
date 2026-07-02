@@ -4,7 +4,9 @@ import SwiftUI
 @MainActor
 final class IconRegistryStore: ObservableObject {
     @Published private(set) var records: [MenuBarItemRecord] = []
+    @Published var hasAccessibilityPermission = false
     @Published var lastScanError: String?
+    @Published var lastScanSummary = "Not scanned yet"
 
     private let configURL: URL
     private let encoder: JSONEncoder
@@ -77,6 +79,7 @@ final class IconRegistryStore: ObservableObject {
         }
 
         records = Array(existing.values).sortedForDisplay().renumbered()
+        lastScanSummary = "Detected \(scannedRecords.count) menu-bar item\(scannedRecords.count == 1 ? "" : "s")"
         save()
     }
 
@@ -86,6 +89,7 @@ final class IconRegistryStore: ObservableObject {
             copy.isAvailable = false
             return copy
         }
+        lastScanSummary = "Accessibility permission is not enabled"
     }
 
     func move(from source: IndexSet, to destination: Int) {

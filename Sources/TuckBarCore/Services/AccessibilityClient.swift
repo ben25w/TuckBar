@@ -46,7 +46,7 @@ final class SystemAccessibilityClient: AccessibilityClient {
     func copyAttribute<T>(_ attribute: String, from element: AXUIElement) throws -> T? {
         var rawValue: CFTypeRef?
         let error = AXUIElementCopyAttributeValue(element, attribute as CFString, &rawValue)
-        if error == .attributeUnsupported || error == .noValue {
+        if error == .attributeUnsupported || error == .noValue || error == .cannotComplete {
             return nil
         }
         guard error == .success else {

@@ -3,7 +3,6 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var store: IconRegistryStore
     @ObservedObject var dockIconController: DockIconController
-    let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
     let onRequestPermission: () -> Void
     let onPress: (String) -> Void
@@ -11,15 +10,15 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: 0) {
             SettingsToolbar(
+                store: store,
                 dockIconController: dockIconController,
-                hasAccessibilityPermission: hasAccessibilityPermission,
                 onRefresh: onRefresh,
                 onRequestPermission: onRequestPermission
             )
 
             Divider()
 
-            if !hasAccessibilityPermission {
+            if !store.hasAccessibilityPermission {
                 VStack(spacing: 14) {
                     Image(systemName: "accessibility")
                         .font(.system(size: 34))
@@ -65,8 +64,8 @@ struct SettingsView: View {
 }
 
 private struct SettingsToolbar: View {
+    @ObservedObject var store: IconRegistryStore
     @ObservedObject var dockIconController: DockIconController
-    let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
     let onRequestPermission: () -> Void
 
@@ -76,7 +75,7 @@ private struct SettingsToolbar: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("TuckBar")
                     .font(.headline)
-                Text("Choose where each menu-bar item appears.")
+                Text(store.lastScanSummary)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -90,7 +89,7 @@ private struct SettingsToolbar: View {
             .toggleStyle(.switch)
             .controlSize(.small)
 
-            if !hasAccessibilityPermission {
+            if !store.hasAccessibilityPermission {
                 Button(action: onRequestPermission) {
                     Label("Permission", systemImage: "lock.open")
                 }

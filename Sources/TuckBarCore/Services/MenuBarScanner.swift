@@ -25,17 +25,21 @@ final class MenuBarScanner: MenuBarScanning {
 
             for (index, child) in children.enumerated() {
                 let title: String? = try accessibilityClient.copyAttribute(kAXTitleAttribute, from: child)
+                let description: String? = try accessibilityClient.copyAttribute("AXDescription", from: child)
                 let help: String? = try accessibilityClient.copyAttribute(kAXHelpAttribute, from: child)
+                let identifier: String? = try accessibilityClient.copyAttribute("AXIdentifier", from: child)
+                let value: String? = try accessibilityClient.copyAttribute(kAXValueAttribute, from: child)
                 let frame = try readFrame(from: child)
                 let processName = application.localizedName ?? application.bundleURL?.deletingPathExtension().lastPathComponent ?? "Unknown"
+                let identityName = firstNonEmpty(identifier, title, description, help, value)
+                let displayName = firstNonEmpty(description, title, help, value, identifier, application.localizedName, application.bundleIdentifier) ?? "Untitled"
                 let id = MenuBarItemIdentity.makeID(
                     bundleIdentifier: application.bundleIdentifier,
                     processName: processName,
-                    title: title,
+                    title: identityName,
                     help: help,
                     fallbackIndex: index
                 )
-                let displayName = firstNonEmpty(title, help, application.localizedName, application.bundleIdentifier) ?? "Untitled"
 
                 let record = MenuBarItemRecord(
                     id: id,
@@ -54,6 +58,13 @@ final class MenuBarScanner: MenuBarScanning {
     }
 
     private func readFrame(from element: AXUIElement) throws -> CGRect? {
+        if let rawFrame: AXValue = try accessibilityClient.copyAttribute("AXFrame", from: element) {
+            var rect = CGRect.zero
+            if AXValueGetValue(rawFrame, .cgRect, &rect) {
+                return rect
+            }
+        }
+
         guard let rawPosition: AXValue = try accessibilityClient.copyAttribute(kAXPositionAttribute, from: element),
               let rawSize: AXValue = try accessibilityClient.copyAttribute(kAXSizeAttribute, from: element) else {
             return nil

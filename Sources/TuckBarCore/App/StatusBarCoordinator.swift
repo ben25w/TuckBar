@@ -96,7 +96,6 @@ final class StatusBarCoordinator: NSObject {
         let view = VirtualShelfView(
             store: store,
             dockIconController: dockIconController,
-            hasAccessibilityPermission: accessibilityClient.isTrusted,
             onRefresh: { [weak self] in self?.refresh() },
             onOpenSettings: { [weak self] in self?.showSettings() },
             onRequestPermission: { [weak self] in self?.requestAccessibilityPermission() },
@@ -133,7 +132,6 @@ final class StatusBarCoordinator: NSObject {
         let view = SettingsView(
             store: store,
             dockIconController: dockIconController,
-            hasAccessibilityPermission: accessibilityClient.isTrusted,
             onRefresh: { [weak self] in self?.refresh() },
             onRequestPermission: { [weak self] in self?.requestAccessibilityPermission() },
             onPress: { [weak self] id in self?.pressItem(withID: id) }
@@ -151,8 +149,10 @@ final class StatusBarCoordinator: NSObject {
     }
 
     func refresh() {
+        store.hasAccessibilityPermission = accessibilityClient.isTrusted
         guard accessibilityClient.isTrusted else {
             store.markAllUnavailable()
+            store.lastScanError = "Enable TuckBar in System Settings > Privacy & Security > Accessibility, then press Refresh."
             return
         }
 
@@ -160,6 +160,7 @@ final class StatusBarCoordinator: NSObject {
             let proxies = try scanner.scan()
             proxiesByID = Dictionary(uniqueKeysWithValues: proxies.map { ($0.record.id, $0) })
             store.merge(scannedRecords: proxies.map(\.record))
+            store.lastScanError = nil
             applyVisibilityPreferences()
         } catch {
             store.lastScanError = error.localizedDescription
@@ -186,6 +187,9 @@ final class StatusBarCoordinator: NSObject {
 
     private func requestAccessibilityPermission() {
         accessibilityClient.requestTrustPrompt()
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
+        }
     }
 }
 

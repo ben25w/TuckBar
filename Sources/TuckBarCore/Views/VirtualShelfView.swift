@@ -3,7 +3,6 @@ import SwiftUI
 struct VirtualShelfView: View {
     @ObservedObject var store: IconRegistryStore
     @ObservedObject var dockIconController: DockIconController
-    let hasAccessibilityPermission: Bool
     let onRefresh: () -> Void
     let onOpenSettings: () -> Void
     let onRequestPermission: () -> Void
@@ -14,7 +13,7 @@ struct VirtualShelfView: View {
         VStack(spacing: 0) {
             ShelfToolbar(
                 dockIconController: dockIconController,
-                hasAccessibilityPermission: hasAccessibilityPermission,
+                hasAccessibilityPermission: store.hasAccessibilityPermission,
                 onRefresh: onRefresh,
                 onOpenSettings: onOpenSettings,
                 onRequestPermission: onRequestPermission,
@@ -31,7 +30,7 @@ struct VirtualShelfView: View {
                     .padding(.bottom, 8)
             }
 
-            if !hasAccessibilityPermission {
+            if !store.hasAccessibilityPermission {
                 PermissionView(onRequestPermission: onRequestPermission)
             } else if store.visibleShelfRecords().isEmpty {
                 EmptyShelfView(onRefresh: onRefresh)
